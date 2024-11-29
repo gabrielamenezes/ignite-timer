@@ -7,5 +7,5 @@ type ThemeType = typeof defaultTheme
 // toda vez que o styled-components for importado,
 // a definição de tipos será a que eu definir aqui
 declare module 'styled-components' {
-  export interface DefaultTheme extends ThemeType
+  export interface DefaultTheme extends ThemeType {}
 }
