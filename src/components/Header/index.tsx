@@ -8,8 +8,8 @@ export const Header = () => {
     <HeaderContainer>
       <img src={logoIgnite} alt="Logo da aplicação em tons de verde" />
       <nav>
-        <NavLink to='/' title="timer"><Timer /></NavLink>
-        <NavLink to='/history' title="histórico"><Scroll /></NavLink>
+        <NavLink to='/' title="Timer"><Timer /></NavLink>
+        <NavLink to='/history' title="Histórico"><Scroll /></NavLink>
       </nav>
     </HeaderContainer>
   )
