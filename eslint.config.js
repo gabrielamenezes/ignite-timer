@@ -6,7 +6,7 @@ export default {
   // Adiciona ou sobrescreve regras
   rules: {
     // Copia as regras existentes do config importado, se houver
-    ...config.rules,  
+    ...config.rules,
     
     // Adiciona ou sobrescreve regras específicas
     "@typescript-eslint/no-empty-object-type": "error",
