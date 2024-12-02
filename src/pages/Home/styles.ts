@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 export const HomeContainer = styled.div`
   flex: 1;
@@ -102,6 +102,6 @@ export const StartCountdownButton = styled.button`
     cursor: not-allowed;
   }
   &:not(:disabled):hover {
-    background-color: ${props=> props.theme['green-700']};
+    background-color: ${props => props.theme['green-700']};
   }
 `

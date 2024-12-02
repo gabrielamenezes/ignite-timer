@@ -5,7 +5,7 @@ import { DefaultLayout } from './layouts/DefaultLayout'
 export const Router = () => {
   return (
     <Routes>
-      <Route path='/' Component={DefaultLayout}>
+      <Route path="/" Component={DefaultLayout}>
         <Route path="/" Component={Home} />
         <Route path="/history" Component={History} />
       </Route>
