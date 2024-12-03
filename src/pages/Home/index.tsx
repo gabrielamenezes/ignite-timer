@@ -1,7 +1,7 @@
-import { Play } from '@phosphor-icons/react'
+import { HandPalm, Play } from '@phosphor-icons/react'
 import {
   CountDownContainer, FormContainer, HomeContainer, MinutesAmountInput,
-  Separator, StartCountdownButton, TaskInput,
+  Separator, StartCountdownButton, StopCountdownButton, TaskInput,
 } from './styles'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -22,6 +22,7 @@ interface Cycle {
   task: string;
   minutesAmount: number;
   startDate: Date;
+  interruptedDate?: Date;
 }
 
 export const Home = () => {
@@ -39,12 +40,16 @@ export const Home = () => {
   const activeCycle = cycles.find(cycle => cycle.id === activeCycleId)
 
   useEffect(() => {
+    let interval: number
     if (activeCycle) {
-      setInterval(() => {
+      interval = setInterval(() => {
         setAmountSecondsPassed(
           differenceInSeconds(new Date(), activeCycle.startDate),
         )
       }, 1000)
+    }
+    return () => {
+      clearInterval(interval)
     }
   }, [activeCycle])
 
@@ -58,7 +63,19 @@ export const Home = () => {
     }
     setCycles(state => [...state, newCycle])
     setActiveCycleId(id)
+    setAmountSecondsPassed(0)
     reset()
+  }
+
+  function handleInterruptCycle() {
+    setCycles(cycles.map(cycle => {
+      if (cycle.id === activeCycleId) {
+        return { ...cycle, interruptedDate: new Date() }
+      } else {
+        return cycle
+      }
+    }))
+    setActiveCycleId(null)
   }
 
   const totalSeconds = activeCycle
@@ -74,6 +91,12 @@ export const Home = () => {
   const minutes = String(minutesAmount).padStart(2, '0')
   const seconds = String(secondsAmount).padStart(2, '0')
 
+  useEffect(() => {
+    if (activeCycle) {
+      document.title = `${minutes}:${seconds}`
+    }
+  }, [minutes, seconds, activeCycle])
+
   const task = watch('task')
   const isSubmitDisabled = !task
   return (
@@ -86,6 +109,7 @@ export const Home = () => {
             placeholder="Dê um nome para o seu projeto"
             list="task-suggestions"
             {...register('task')}
+            disabled={!!activeCycle}
           />
           <datalist id="task-suggestions">
             <option value="Projeto 1" />
@@ -98,6 +122,7 @@ export const Home = () => {
             max={60} {...register('minutesAmount', {
               valueAsNumber: true,
             })}
+            disabled={!!activeCycle}
           />
 
           <span>minutos.</span>
@@ -111,10 +136,21 @@ export const Home = () => {
           <span>{seconds[1]}</span>
         </CountDownContainer>
 
-        <StartCountdownButton type="submit" disabled={isSubmitDisabled}>
-          <Play size={24} />
-          Começar
-        </StartCountdownButton>
+        {
+          activeCycle
+            ? (
+              <StopCountdownButton type="button" onClick={handleInterruptCycle}>
+                <HandPalm size={24} />
+                Interrupt
+              </StopCountdownButton>
+              )
+            : (
+              <StartCountdownButton type="submit" disabled={isSubmitDisabled}>
+                <Play size={24} />
+                Começar
+              </StartCountdownButton>
+              )
+        }
       </form>
 
     </HomeContainer>
