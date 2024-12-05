@@ -5,7 +5,9 @@ import { CyclesContext } from '../..'
 
 export const Countdown = () => {
   const [amoutSecondsPassed, setAmountSecondsPassed] = useState(0)
-  const { activeCycle } = useContext(CyclesContext)
+  const { activeCycle, activeCycleId, markCurrentCycleAsFinished } =
+  useContext(CyclesContext)
+
   const totalSeconds = activeCycle
     ? activeCycle.minutesAmount * 60
     : 0
@@ -17,13 +19,7 @@ export const Countdown = () => {
           new Date(), activeCycle.startDate,
         )
         if (secondsDifference >= totalSeconds) {
-          setCycles(state => state.map(cycle => {
-            if (cycle.id === activeCycleId) {
-              return { ...cycle, finishedDate: new Date() }
-            } else {
-              return cycle
-            }
-          }))
+          markCurrentCycleAsFinished()
           setAmountSecondsPassed(totalSeconds)
           clearInterval(interval)
         } else {
@@ -34,7 +30,23 @@ export const Countdown = () => {
     return () => {
       clearInterval(interval)
     }
-  }, [activeCycle, totalSeconds, activeCycleId])
+  }, [activeCycle, totalSeconds, activeCycleId, markCurrentCycleAsFinished])
+
+  const currentSeconds = activeCycle
+    ? totalSeconds - amoutSecondsPassed
+    : 0
+
+  const minutesAmount = Math.floor(currentSeconds / 60)
+  const secondsAmount = currentSeconds % 60
+
+  const minutes = String(minutesAmount).padStart(2, '0')
+  const seconds = String(secondsAmount).padStart(2, '0')
+
+  useEffect(() => {
+    if (activeCycle) {
+      document.title = `${minutes}:${seconds}`
+    }
+  }, [minutes, seconds, activeCycle])
 
   return (
     <CountDownContainer>

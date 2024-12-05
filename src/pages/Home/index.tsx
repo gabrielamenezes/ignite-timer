@@ -4,7 +4,7 @@ import {
   StartCountdownButton, StopCountdownButton,
 } from './styles'
 
-import { createContext, useEffect, useState } from 'react'
+import { createContext, useState } from 'react'
 import { NewCycleForm } from './components/NewCycleForm'
 import { Countdown } from './components/Countdown'
 
@@ -18,6 +18,8 @@ interface Cycle {
 }
 interface CyclesContextType {
   activeCycle: Cycle | undefined
+  activeCycleId: string | null
+  markCurrentCycleAsFinished: () => void
 
 }
 export const CyclesContext = createContext({} as CyclesContextType)
@@ -40,6 +42,16 @@ export const Home = () => {
     reset()
   }
 
+  function markCurrentCycleAsFinished() {
+    setCycles(state => state.map(cycle => {
+      if (cycle.id === activeCycleId) {
+        return { ...cycle, finishedDate: new Date() }
+      } else {
+        return cycle
+      }
+    }))
+  }
+
   function handleInterruptCycle() {
     setCycles(state => state.map(cycle => {
       if (cycle.id === activeCycleId) {
@@ -51,28 +63,17 @@ export const Home = () => {
     setActiveCycleId(null)
   }
 
-  const currentSeconds = activeCycle
-    ? totalSeconds - amoutSecondsPassed
-    : 0
-
-  const minutesAmount = Math.floor(currentSeconds / 60)
-  const secondsAmount = currentSeconds % 60
-
-  const minutes = String(minutesAmount).padStart(2, '0')
-  const seconds = String(secondsAmount).padStart(2, '0')
-
-  useEffect(() => {
-    if (activeCycle) {
-      document.title = `${minutes}:${seconds}`
-    }
-  }, [minutes, seconds, activeCycle])
-
   const task = watch('task')
   const isSubmitDisabled = !task
   return (
     <HomeContainer>
       <form action="" onSubmit={handleSubmit(handleCreateNewCycle)}>
-        <CyclesContext.Provider value={{ activeCycle }}>
+        <CyclesContext.Provider value={{
+          activeCycle,
+          activeCycleId,
+          markCurrentCycleAsFinished,
+        }}
+        >
           <NewCycleForm />
           <Countdown />
         </CyclesContext.Provider>
